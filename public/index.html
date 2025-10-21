@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>URJC pedalea - MVP</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="/logo.ico" />
+</head>
+<body>
+  <header>
+    <a class="brand" href="/" title="URJC pedalea">
+      <img src="/logo.png" alt="URJC pedalea logo" class="brand-logo" />
+      <h1 class="brand-title">URJC pedalea</h1>
+    </a>
+    <nav>
+      <a href="/">Home</a> |
+      <a href="/about.html">Acerca de</a> |
+      <a href="#">Planificador</a>
+    </nav>
+  </header>
+  <main>
+    <section>
+      <h2>Estado del servidor</h2>
+      <div id="ping">Comprobando...</div>
+    </section>
+    <section>
+      <h2>APIs de ejemplo</h2>
+      <ul>
+        <li>GET /api/ping</li>
+        <li>POST /api/auth/register</li>
+        <li>POST /api/auth/login</li>
+        <li>POST /api/routes (form-data gpx)</li>
+      </ul>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
