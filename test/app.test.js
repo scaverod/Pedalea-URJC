@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const app = require('../src/server');
 
+
 describe('Basic API', () => {
   test('GET /api/ping returns ok', async () => {
     const res = await request(app).get('/api/ping');
@@ -14,17 +15,11 @@ describe('Basic API', () => {
   let testEmail = `test+${Date.now()}@example.com`;
   let testPassword = 'secret123';
 
-  test('POST /api/auth/register and login', async () => {
+  test('POST /api/auth/register', async () => {
     const reg = await request(app).post('/api/auth/register').send({ email: testEmail, password: testPassword, username: 'tester' });
-    expect([200,201]).toContain(reg.statusCode);
-    expect(reg.body).toHaveProperty('user');
-    expect(reg.body.user).toHaveProperty('email', testEmail);
-
-    const login = await request(app).post('/api/auth/login').send({ email: testEmail, password: testPassword });
-    expect(login.statusCode).toBe(200);
-    expect(login.body).toHaveProperty('user');
-    expect(login.body.user).toHaveProperty('email', testEmail);
-  }, 10000);
+    expect(reg.statusCode).toBe(201);
+  expect(reg.body).toHaveProperty('message', 'User registered successfully. Verification email sent.');
+  }); // Added missing closing brace here
 
   test('POST /api/routes upload GPX', async () => {
     const gpxSample = path.join(__dirname, 'sample.gpx');

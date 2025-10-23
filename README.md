@@ -27,8 +27,6 @@ Checklist de requisitos (extraídos del enunciado)
 
 ---
 
-## Pliego (migrado)
-
 Aplicación Web: "URJC pedalea"
 
 Fecha: 2025-10-21
@@ -215,10 +213,10 @@ Epic 8 — Moderación
 
 ---
 
-## Kanban (todas las tarjetas en "To Do" porque el proyecto acaba de empezar)
+## Kanban (actualizado)
 
 Tablero con tres columnas: To Do | In Progress | Done
-
+Tablero con tres columnas: To Do | In Progress | Done | On review
 To Do
 ------
 - PP-01: Noticias y Eventos — Crear CRUD de noticias en ES/EN
@@ -226,11 +224,6 @@ To Do
 - NF-06: Página About (/about) — Contenido estático
 - NF-07: Página Ayuda — Guías exportar GPX
 - US-08: Banner cookies y enlaces legales
-- US-01: Registro por email y contraseña
-- US-02: Login/Logout
-- US-05: Recuperar contraseña (SMTP)
-- US-06: Editar perfil (nombre público y contraseña)
-- US-07: Eliminar cuenta y anonimizar contenido
 - US-03: Perfil de usuario (favoritos y logros)
 - US-04: Centro de notificaciones
 - RT-01: Subida GPX y parser
@@ -250,11 +243,8 @@ To Do
 - GM-02: Página de clasificación mensual
 - GM-03: Sistema de logros y niveles
 - GM-04: Histórico de ganadores
-- AD-06: Crear cuenta admin por defecto (admin/admin) y forzar cambio
-- AD-07: Dashboard admin con tareas
 - AD-02: CRUD Noticias/Eventos (ES/EN)
 - AD-03: Validación/rechazo de rutas (notificar motivo)
-- AD-08: Gestión de usuarios (banear, reset pwd)
 - AD-05: Moderación de Puntos Críticos y Sugerencias
 - MD-01: Botón "Reportar" en contenido
 - MD-02: Revisión de reportes en admin
@@ -262,18 +252,34 @@ To Do
 - NF-02: Aplicar colores URJC y animaciones
 - I18N-01: Internacionalización ES/EN y API de traducción
 - NF-03: Decidir frameworks/librerías frontend
-- NF-04: Decidir framework backend
-- NF-05: Preparar SQLite y esquema inicial
-- US-05(SVC): Configurar SMTP en entorno
 
 In Progress
 -----------
-(vacío)
+- US-06: Editar perfil (nombre público y contraseña) - Backend listo, frontend solo muestra datos.
+- US-07: Eliminar cuenta y anonimizar contenido - Backend y frontend implementado; flujo de eliminación enviado por email y confirmación con contraseña en cliente. (On review: tests added)
+- AD-07: Dashboard admin con tareas - Listado de usuarios implementado, CRUD pendiente.
+- AD-08: Gestión de usuarios (banear, reset pwd) - Backend listo, frontend pendiente.
 
 Done
 ----
-(vacío)
+- US-01: Registro por email y contraseña
+- US-02: Login/Logout
+- US-05: Recuperar contraseña (SMTP)
+- AD-06: Crear cuenta admin por defecto (admin/admin) y forzar cambio
+- NF-04: Decidir framework backend (Node.js/Express)
+- NF-05: Preparar SQLite y esquema inicial
+- US-05(SVC): Configurar SMTP en entorno (placeholders en .env)
 
----
+Implemented features (summary)
+--------------------------------
+- User registration (email+password) with email verification token sent on register.
+- Login and JWT issuance.
+- Password recovery: forgot-password sends email with reset token; reset-password endpoint implemented.
+- Account deletion flow: from profile user can request deletion, server emails a confirmation link to a client route `/confirm-delete/:token`, client requests password and POSTs to `/api/auth/confirm-delete/:token` to finalize deletion. Backend validates password and deletes account. Tests cover the full flow.
+- Frontend components: `Profile` (with Delete account button), `ConfirmDelete` (password form), `Register`, `Login`, `ResetPassword`.
+- Automated tests: Jest tests covering auth, users, frontend unit tests and a new E2E-style test for account deletion. All tests pass locally.
 
+On review
+---------
+- US-07: Account deletion flow — automated tests added and passing; ready for manual QA on staging. (This column indicates features under active testing/QA.)
 

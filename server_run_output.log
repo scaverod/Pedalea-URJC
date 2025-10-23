@@ -1,0 +1,15 @@
+[dotenv@17.2.3] injecting env (8) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+Server listening on http://localhost:3000
+New connection from ::1 53343
+[2025-10-23T11:12:13.229Z] GET /profile
+New connection from ::ffff:127.0.0.1 53356
+[2025-10-23T11:12:30.543Z] GET /profile
+New connection from ::ffff:127.0.0.1 53359
+[2025-10-23T11:12:35.201Z] POST /api/auth/request-delete
+New connection from ::ffff:127.0.0.1 53369
+[2025-10-23T11:12:53.317Z] GET /confirm-delete/b9d1f2ed405ea02f75e50ac7fffd04a7d574d8c4
+New connection from ::ffff:127.0.0.1 53370
+[2025-10-23T11:12:57.022Z] POST /api/auth/confirm-delete/b9d1f2ed405ea02f75e50ac7fffd04a7d574d8c4
+New connection from ::ffff:127.0.0.1 53391
+New connection from ::ffff:127.0.0.1 53394
+New connection from ::ffff:127.0.0.1 53395

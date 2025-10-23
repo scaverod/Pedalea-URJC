@@ -1,13 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const helmet = require('helmet');
 const multer = require('multer');
 const fs = require('fs');
 
 const db = require('./db');
+const authRoutes = require('./routes/auth'); // Import auth routes
+const userRoutes = require('./routes/users'); // Import user routes
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// Simple request logger to help debug connectivity/timeouts during development
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  // also write to a lightweight dev log file if possible
+  try {
+    fs.appendFileSync(path.join(__dirname, '..', 'server_requests.log'), `${new Date().toISOString()} ${req.method} ${req.originalUrl}\n`);
+  } catch (e) {
+    // ignore logging errors in development
+  }
+  next();
+});
+
+// Error handler to log unexpected errors
+app.use((err, req, res, next) => {
+  console.error('Unhandled error in request pipeline:', err && err.stack ? err.stack : err);
+  try {
+    fs.appendFileSync(path.join(__dirname, '..', 'server_errors.log'), `${new Date().toISOString()} ${err}\n`);
+  } catch (e) {}
+  if (!res.headersSent) {
+    res.status(500).json({ error: 'internal_server_error' });
+  } else {
+    next(err);
+  }
+});
+
 // Upload setup
 const uploadDir = path.resolve(__dirname, '..', 'data', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
@@ -27,36 +53,21 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-app.get('/api/ping', (req, res) => res.json({ ok: true, now: new Date().toISOString() }));
-
-// Register
-app.post('/api/auth/register', (req, res) => {
-  const { email, password, username } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'email_and_password_required' });
-  const passwordHash = bcrypt.hashSync(password, 10);
+app.get('/api/ping', (req, res) => {
+  const now = new Date().toISOString();
+  const msg = `${now} /api/ping hit\n`;
   try {
-    const stmt = db.prepare('INSERT INTO users (email, passwordHash, username) VALUES (?, ?, ?)');
-    const info = stmt.run(email, passwordHash, username || null);
-    const user = db.prepare('SELECT id, email, username, role, points, createdAt FROM users WHERE id = ?').get(info.lastInsertRowid);
-    return res.json({ user });
-  } catch (err) {
-    if (err && err.code === 'SQLITE_CONSTRAINT_UNIQUE') return res.status(409).json({ error: 'email_exists' });
-    console.error(err);
-    return res.status(500).json({ error: 'db_error' });
+    fs.appendFileSync(path.join(__dirname, '..', 'server_requests.log'), msg);
+  } catch (e) {
+    // If logging fails, still respond
+    console.error('Failed to write ping log:', e && e.stack ? e.stack : e);
   }
+  res.json({ ok: true, now });
 });
 
-// Login
-app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'email_and_password_required' });
-  const user = db.prepare('SELECT * FROM users WHERE email = ? AND deletedAt IS NULL').get(email);
-  if (!user) return res.status(401).json({ error: 'invalid_credentials' });
-  const ok = bcrypt.compareSync(password, user.passwordHash);
-  if (!ok) return res.status(401).json({ error: 'invalid_credentials' });
-  const safeUser = { id: user.id, email: user.email, username: user.username, role: user.role, points: user.points };
-  return res.json({ user: safeUser });
-});
+// Use authentication routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes); // Use user routes
 
 // Upload GPX (simple)
 app.post('/api/routes', upload.single('gpx'), (req, res) => {
@@ -88,8 +99,32 @@ app.post('/api/news', (req, res) => {
   res.json({ news: item });
 });
 
+// Serve frontend for any non-API route (allows client-side routing for pages like /reset-password/:token)
+// Serve index.html for any non-API path using a regex route to avoid path-to-regexp issues
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
+
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
+  const server = app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
+
+  // Log low-level TCP connections for debugging
+  server.on('connection', (socket) => {
+    try {
+      const addr = socket.remoteAddress;
+      const port = socket.remotePort;
+      const ln = `${new Date().toISOString()} connection from ${addr}:${port}\n`;
+      fs.appendFileSync(path.join(__dirname, '..', 'server_connections.log'), ln);
+      console.log('New connection from', addr, port);
+      socket.on('close', () => {
+        try {
+          fs.appendFileSync(path.join(__dirname, '..', 'server_connections.log'), `${new Date().toISOString()} closed ${addr}:${port}\n`);
+        } catch (e) {}
+      });
+    } catch (e) {
+      console.error('Failed to log connection', e && e.stack ? e.stack : e);
+    }
+  });
 }
 
 module.exports = app;

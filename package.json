@@ -5,25 +5,50 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-  "dev": "nodemon src/server.js",
-  "test": "jest --runInBand"
+    "dev": "nodemon src/server.js",
+    "test": "jest --runInBand",
+    "build-fe": "webpack --mode production",
+    "watch-fe": "webpack --watch --mode development"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/public/src/setupTests.js"
+    ]
   },
   "engines": {
     "node": ">=14"
   },
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-react": "^7.27.1",
+    "babel-loader": "^10.0.0",
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.4.1",
+    "bootstrap": "^5.3.8",
     "cors": "^2.8.5",
+    "css-loader": "^7.1.2",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
-    "multer": "^2.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.9",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.4",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
   },
   "devDependencies": {
-  "nodemon": "^3.1.10",
-  "jest": "^29.6.1",
-  "supertest": "^6.3.3"
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "jest": "^29.6.1",
+    "jest-environment-jsdom": "^30.2.0",
+    "nodemon": "^3.1.10",
+    "supertest": "^6.3.3"
   }
 }

@@ -64,4 +64,39 @@ CREATE TABLE IF NOT EXISTS news (
 );
 `);
 
+// Add resetPasswordToken and resetPasswordExpires columns if they don't exist
+const userColumns = db.prepare("PRAGMA table_info(users)").all();
+const hasResetPasswordToken = userColumns.some(col => col.name === 'resetPasswordToken');
+const hasResetPasswordExpires = userColumns.some(col => col.name === 'resetPasswordExpires');
+
+if (!hasResetPasswordToken) {
+  db.exec(`ALTER TABLE users ADD COLUMN resetPasswordToken TEXT`);
+}
+if (!hasResetPasswordExpires) {
+  db.exec(`ALTER TABLE users ADD COLUMN resetPasswordExpires INTEGER`);
+}
+
+// Add email verification and account deletion columns if they don't exist
+const hasEmailVerified = userColumns.some(col => col.name === 'emailVerified');
+const hasEmailVerificationToken = userColumns.some(col => col.name === 'emailVerificationToken');
+const hasEmailVerificationExpires = userColumns.some(col => col.name === 'emailVerificationExpires');
+const hasAccountDeletionToken = userColumns.some(col => col.name === 'accountDeletionToken');
+const hasAccountDeletionExpires = userColumns.some(col => col.name === 'accountDeletionExpires');
+
+if (!hasEmailVerified) {
+  db.exec(`ALTER TABLE users ADD COLUMN emailVerified INTEGER DEFAULT 0`);
+}
+if (!hasEmailVerificationToken) {
+  db.exec(`ALTER TABLE users ADD COLUMN emailVerificationToken TEXT`);
+}
+if (!hasEmailVerificationExpires) {
+  db.exec(`ALTER TABLE users ADD COLUMN emailVerificationExpires INTEGER`);
+}
+if (!hasAccountDeletionToken) {
+  db.exec(`ALTER TABLE users ADD COLUMN accountDeletionToken TEXT`);
+}
+if (!hasAccountDeletionExpires) {
+  db.exec(`ALTER TABLE users ADD COLUMN accountDeletionExpires INTEGER`);
+}
+
 module.exports = db;
