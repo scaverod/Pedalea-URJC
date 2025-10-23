@@ -5,6 +5,8 @@ function ConfirmDelete() {
   const { token } = useParams();
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -20,17 +22,17 @@ function ConfirmDelete() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert(data.message || 'Account deleted.');
+        setMessage(data.message || 'Account deleted.');
         // Clear local storage and navigate to home
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/');
       } else {
-        alert(data.message || 'Could not delete account.');
+        setError(data.message || 'Could not delete account.');
       }
     } catch (e) {
       console.error('Confirm delete submit error:', e);
-      alert('Server error while deleting account.');
+      setError('Server error while deleting account.');
     } finally {
       setLoading(false);
     }
@@ -43,6 +45,8 @@ function ConfirmDelete() {
           <div className="card">
             <div className="card-header">Confirm Account Deletion</div>
             <div className="card-body">
+              {error && <div className="text-danger mb-2">{error}</div>}
+              {message && <div className="text-success mb-2">{message}</div>}
               <p>Please enter your password to confirm account deletion. This action is irreversible.</p>
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">

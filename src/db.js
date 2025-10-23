@@ -82,6 +82,7 @@ const hasEmailVerificationToken = userColumns.some(col => col.name === 'emailVer
 const hasEmailVerificationExpires = userColumns.some(col => col.name === 'emailVerificationExpires');
 const hasAccountDeletionToken = userColumns.some(col => col.name === 'accountDeletionToken');
 const hasAccountDeletionExpires = userColumns.some(col => col.name === 'accountDeletionExpires');
+const hasSuspended = userColumns.some(col => col.name === 'suspended');
 
 if (!hasEmailVerified) {
   db.exec(`ALTER TABLE users ADD COLUMN emailVerified INTEGER DEFAULT 0`);
@@ -97,6 +98,37 @@ if (!hasAccountDeletionToken) {
 }
 if (!hasAccountDeletionExpires) {
   db.exec(`ALTER TABLE users ADD COLUMN accountDeletionExpires INTEGER`);
+}
+if (!hasSuspended) {
+  db.exec(`ALTER TABLE users ADD COLUMN suspended INTEGER DEFAULT 0`);
+}
+
+// Ensure there is an admin user with known credentials for development
+try {
+  const bcrypt = require('bcryptjs');
+  const adminEmail = 'admin@example.com';
+  const adminPassword = 'admin@example.com'; // username and password equal to email as requested
+  const existing = db.prepare('SELECT * FROM users WHERE email = ?').get(adminEmail);
+  if (!existing) {
+    const passwordHash = bcrypt.hashSync(adminPassword, 10);
+    const stmt = db.prepare(`INSERT INTO users (email, passwordHash, username, role, emailVerified) VALUES (?, ?, ?, ?, ?)`);
+    stmt.run(adminEmail, passwordHash, adminEmail, 'ROLE_ADMIN', 1);
+    console.log('[db] seeded admin user:', adminEmail);
+  } else {
+    // If user exists but is not admin or password differs, update role and password to match request
+    const needsUpdate = existing.role !== 'ROLE_ADMIN' || !existing.email || existing.email !== adminEmail;
+    if (needsUpdate) {
+      const updateStmt = db.prepare('UPDATE users SET role = ? WHERE email = ?');
+      updateStmt.run('ROLE_ADMIN', adminEmail);
+      console.log('[db] updated existing user to ROLE_ADMIN:', adminEmail);
+    }
+    // Always ensure password matches the requested one in dev environment
+    const passwordHash = bcrypt.hashSync(adminPassword, 10);
+    const pwStmt = db.prepare('UPDATE users SET passwordHash = ?, emailVerified = 1 WHERE email = ?');
+    pwStmt.run(passwordHash, adminEmail);
+  }
+} catch (e) {
+  console.error('Error seeding admin user:', e);
 }
 
 module.exports = db;

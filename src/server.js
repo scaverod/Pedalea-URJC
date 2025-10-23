@@ -69,6 +69,11 @@ app.get('/api/ping', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes); // Use user routes
 
+// Return JSON 404 for any unmatched /api/* routes (helps clients avoid HTML 404 responses)
+app.use('/api', (req, res) => {
+  res.status(404).json({ message: 'API endpoint not found.' });
+});
+
 // Upload GPX (simple)
 app.post('/api/routes', upload.single('gpx'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'gpx_required' });

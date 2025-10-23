@@ -84,6 +84,11 @@ router.post('/login', async (req, res) => {
             return res.status(403).json({ message: 'Email not verified. Please verify your email before logging in.' });
         }
 
+        // Prevent suspended users from logging in
+        if (user.suspended) {
+            return res.status(403).json({ message: 'Account suspended. Contact an administrator.' });
+        }
+
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials.' });

@@ -127,4 +127,99 @@ router.delete('/:id', auth, authorize(['ROLE_ADMIN']), (req, res) => {
     }
 });
 
+// Admin: resend verification email
+router.post('/:id/resend-verification', auth, authorize(['ROLE_ADMIN']), async (req, res) => {
+    const { id } = req.params;
+    console.log(`[users] resend-verification invoked for id=${id} by user=${req.user && req.user.id}`);
+    try {
+        const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+
+        const crypto = require('crypto');
+        const verificationToken = crypto.randomBytes(20).toString('hex');
+        const verificationExpires = Date.now() + 24 * 60 * 60 * 1000;
+        db.prepare('UPDATE users SET emailVerificationToken = ?, emailVerificationExpires = ? WHERE id = ?')
+          .run(verificationToken, verificationExpires, id);
+
+        const verifyUrl = `http://${req.headers.host}/api/auth/verify-email/${verificationToken}`;
+                        // If SMTP is not configured, skip sending mail in development and return immediately
+                        if (!process.env.SMTP_HOST) {
+                            console.log('[users] SMTP not configured - skipping resend verification email (dev mode)');
+                            return res.json({ message: 'Verification email resent (skipped - SMTP not configured).' });
+                        }
+                        const transporter = require('nodemailer').createTransport({
+                                host: process.env.SMTP_HOST,
+                                port: process.env.SMTP_PORT,
+                                secure: process.env.SMTP_SECURE === 'true',
+                                auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+                        });
+                        try {
+                            await transporter.sendMail({ to: user.email, from: process.env.SMTP_FROM_EMAIL, subject: 'Verify your email', html: `Click: <a href="${verifyUrl}">${verifyUrl}</a>` });
+                        } catch (e) {
+                            console.error('Resend verification sendMail error', e);
+                            return res.status(500).json({ message: 'Failed to send verification email.' });
+                        }
+
+                        res.json({ message: 'Verification email resent.' });
+    } catch (error) {
+        console.error('Resend verification error:', error);
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// Admin: send password reset for user
+router.post('/:id/send-reset', auth, authorize(['ROLE_ADMIN']), async (req, res) => {
+    const { id } = req.params;
+    console.log(`[users] send-reset invoked for id=${id} by user=${req.user && req.user.id}`);
+    try {
+        const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+
+        const crypto = require('crypto');
+        const resetToken = crypto.randomBytes(20).toString('hex');
+        const resetTokenExpires = Date.now() + 3600000; // 1h
+        db.prepare('UPDATE users SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE id = ?')
+          .run(resetToken, resetTokenExpires, id);
+
+        const resetUrl = `http://${req.headers.host}/reset-password/${resetToken}`;
+                        // If SMTP is not configured, skip sending mail in development and return immediately
+                        if (!process.env.SMTP_HOST) {
+                            console.log('[users] SMTP not configured - skipping send reset email (dev mode)');
+                            return res.json({ message: 'Password reset email sent (skipped - SMTP not configured).' });
+                        }
+                        const transporter = require('nodemailer').createTransport({
+                                host: process.env.SMTP_HOST,
+                                port: process.env.SMTP_PORT,
+                                secure: process.env.SMTP_SECURE === 'true',
+                                auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+                        });
+                        try {
+                            await transporter.sendMail({ to: user.email, from: process.env.SMTP_FROM_EMAIL, subject: 'Password reset', html: `Reset: <a href="${resetUrl}">${resetUrl}</a>` });
+                        } catch (e) {
+                            console.error('Send reset sendMail error', e);
+                            return res.status(500).json({ message: 'Failed to send password reset email.' });
+                        }
+
+                        res.json({ message: 'Password reset email sent.' });
+    } catch (error) {
+        console.error('Send reset error:', error);
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// Admin: suspend / unsuspend user
+router.post('/:id/suspend', auth, authorize(['ROLE_ADMIN']), (req, res) => {
+    const { id } = req.params;
+    const { suspend } = req.body; // boolean
+    try {
+        const stmt = db.prepare('UPDATE users SET suspended = ? WHERE id = ?');
+        const info = stmt.run(suspend ? 1 : 0, id);
+        if (info.changes === 0) return res.status(404).json({ message: 'User not found.' });
+        res.json({ message: suspend ? 'User suspended.' : 'User unsuspended.' });
+    } catch (error) {
+        console.error('Suspend error:', error);
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
 module.exports = router;

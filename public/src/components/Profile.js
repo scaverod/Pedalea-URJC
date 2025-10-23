@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 function Profile() {
   const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,15 +32,19 @@ function Profile() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(token ? { 'x-auth-token': token } : {}),
         },
         body: JSON.stringify({ email: user.email }),
       });
       const data = await res.json();
-      alert(data.message || 'If an account with that email exists, a deletion link has been sent.');
+      if (res.ok) {
+        setMessage(data.message || 'If an account with that email exists, a deletion link has been sent.');
+      } else {
+        setError(data.message || 'If an account with that email exists, a deletion link has been sent.');
+      }
     } catch (e) {
       console.error('Request delete error:', e);
-      alert('Error requesting account deletion.');
+      setError('Error requesting account deletion.');
     }
   };
 
@@ -53,6 +59,8 @@ function Profile() {
           <div className="card">
             <div className="card-header">User Profile</div>
             <div className="card-body">
+              {error && <div className="text-danger mb-2">{error}</div>}
+              {message && <div className="text-success mb-2">{message}</div>}
               <p><strong>Email:</strong> {user.email}</p>
               <p><strong>Username:</strong> {user.username}</p>
               <p><strong>Role:</strong> {user.role}</p>
