@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer'); // For sending emails
 const db = require('../db');
 
 const router = express.Router();
+const { auth } = require('../middleware/auth');
 
 // Configure Nodemailer (using environment variables)
 const transporter = nodemailer.createTransport({
@@ -104,6 +105,20 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: 'Server error during login.' });
+    }
+});
+
+// Return current authenticated user (authoritative)
+router.get('/me', auth, (req, res) => {
+    // req.user is set by auth middleware (contains id and role)
+    try {
+        const stmt = db.prepare('SELECT id, email, username, role FROM users WHERE id = ?');
+        const user = stmt.get(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+        res.json(user);
+    } catch (e) {
+        console.error('GET /me error:', e);
+        res.status(500).json({ message: 'Server error.' });
     }
 });
 

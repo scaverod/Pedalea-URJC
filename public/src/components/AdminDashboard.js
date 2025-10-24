@@ -31,8 +31,19 @@ function AdminDashboard() {
         navigate('/login');
         return;
       }
-
       try {
+        // Verify current user from authoritative endpoint
+        const meRes = await fetch('/api/auth/me', { headers: { 'x-auth-token': token } });
+        if (!meRes.ok) {
+          navigate('/login');
+          return;
+        }
+        const me = await meRes.json();
+        if (me.role !== 'ROLE_ADMIN') {
+          setError('You do not have permission to view this page.');
+          return;
+        }
+
         const response = await fetch('/api/users', {
           headers: {
             'x-auth-token': token,
