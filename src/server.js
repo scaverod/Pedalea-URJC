@@ -13,7 +13,13 @@ const userRoutes = require('./routes/users'); // Import user routes
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(helmet());
+// Use helmet but relax Content Security Policy in development so webpack's devtool (eval) isn't blocked.
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
+  // Disable CSP in development for easier debugging (webpack devtool uses eval()).
+  app.use(helmet({ contentSecurityPolicy: false }));
+} else {
+  app.use(helmet());
+}
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

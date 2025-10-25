@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // New state for success messages
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Clear previous errors
+    setSuccessMessage(''); // Clear previous success messages
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -23,10 +25,10 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store token and user info (e.g., in localStorage or context)
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/profile'); // Redirect to profile page on successful login
+        setSuccessMessage('Inicio de sesión correcto. Redirigiendo...'); // Set success message
+        setTimeout(() => navigate('/profile'), 650);
       } else {
         setError(data.message || 'Login failed');
       }
@@ -37,41 +39,38 @@ function Login() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">Login</div>
-            <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                {error && <div className="alert alert-danger">{error}</div>}
-                <div className="mb-3">
-                  <label htmlFor="emailInput" className="form-label">Email address</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="emailInput"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="passwordInput" className="form-label">Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="passwordInput"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary">Login</button>
-              </form>
-            </div>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-card-header">Iniciar Sesión</div>
+        <form onSubmit={handleSubmit}>
+          {error && <div className="alert-error">{error}</div>}
+          {successMessage && <div className="alert-success">{successMessage}</div>} {/* Render success message */}
+          <div className="form-group">
+            <label htmlFor="emailInput" className="form-label">Correo Electrónico</label>
+            <input
+              type="email"
+              className="form-input"
+              id="emailInput"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-        </div>
+          <div className="form-group">
+            <label htmlFor="passwordInput" className="form-label">Contraseña</label>
+            <input
+              type="password"
+              className="form-input"
+              id="passwordInput"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="auth-button">Acceder</button>
+        </form>
+        <Link to="/forgot-password" className="auth-link">¿Olvidaste tu contraseña?</Link>
+        <Link to="/register" className="auth-link">¿No tienes cuenta? Regístrate</Link>
       </div>
     </div>
   );

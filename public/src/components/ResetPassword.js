@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -15,7 +15,7 @@ function ResetPassword() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError('Las contraseñas no coinciden.');
       return;
     }
 
@@ -45,42 +45,37 @@ function ResetPassword() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">Reset Password</div>
-            <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                {error && <div className="alert alert-danger">{error}</div>}
-                {message && <div className="alert alert-success">{message}</div>}
-                <div className="mb-3">
-                  <label htmlFor="passwordInput" className="form-label">New Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="passwordInput"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="confirmPasswordInput" className="form-label">Confirm New Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="confirmPasswordInput"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary">Reset Password</button>
-              </form>
-            </div>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-card-header">Restablecer Contraseña</div>
+        <form onSubmit={handleSubmit}>
+          {error && <div className="alert-error">{error}</div>}
+          {message && <div className="alert-success">{message}</div>}
+          <div className="form-group">
+            <label htmlFor="passwordInput" className="form-label">Nueva Contraseña</label>
+            <input
+              type="password"
+              className="form-input"
+              id="passwordInput"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
-        </div>
+          <div className="form-group">
+            <label htmlFor="confirmPasswordInput" className="form-label">Confirmar Nueva Contraseña</label>
+            <input
+              type="password"
+              className="form-input"
+              id="confirmPasswordInput"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="auth-button">Restablecer Contraseña</button>
+        </form>
+        <Link to="/login" className="auth-link">Volver al Inicio de Sesión</Link>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Register() {
   const [email, setEmail] = useState('');
@@ -27,7 +27,7 @@ function Register() {
 
       if (response.ok) {
         // Inform the user they must verify email before first login
-        let successText = 'Registration successful! Para iniciar sesión por primera vez, valida primero tu correo. Te hemos enviado un email de verificación.';
+        let successText = '¡Registro exitoso! Para iniciar sesión por primera vez, valida primero tu correo. Te hemos enviado un email de verificación.';
         if (data && data.message) {
           successText = `${data.message} Para iniciar sesión por primera vez, valida primero tu correo.`;
         }
@@ -43,53 +43,48 @@ function Register() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">Register</div>
-            <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                {error && <div className="alert alert-danger">{error}</div>}
-                {message && <div className="alert alert-success">{message}</div>}
-                <div className="mb-3">
-                  <label htmlFor="emailInput" className="form-label">Email address</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="emailInput"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="usernameInput" className="form-label">Username</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="usernameInput"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="passwordInput" className="form-label">Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="passwordInput"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary">Register</button>
-              </form>
-            </div>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-card-header">Registrarse</div>
+        <form onSubmit={handleSubmit}>
+          {error && <div className="alert-error">{error}</div>}
+          {message && <div className="alert-success">{message}</div>}
+          <div className="form-group">
+            <label htmlFor="emailInput" className="form-label">Correo Electrónico</label>
+            <input
+              type="email"
+              className="form-input"
+              id="emailInput"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-        </div>
+          <div className="form-group">
+            <label htmlFor="usernameInput" className="form-label">Nombre de Usuario</label>
+            <input
+              type="text"
+              className="form-input"
+              id="usernameInput"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="passwordInput" className="form-label">Contraseña</label>
+            <input
+              type="password"
+              className="form-input"
+              id="passwordInput"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="auth-button">Registrarse</button>
+        </form>
+        <Link to="/login" className="auth-link">¿Ya tienes cuenta? Inicia Sesión</Link>
       </div>
     </div>
   );

@@ -27,9 +27,9 @@ describe('Login Component', () => {
         <Login />
       </Router>
     );
-    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/correo electrónico/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/contraseña/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /acceder/i })).toBeInTheDocument();
   });
 
   it('shows error message on failed login', async () => {
@@ -46,13 +46,13 @@ describe('Login Component', () => {
       </Router>
     );
 
-    fireEvent.change(screen.getByLabelText(/email address/i), {
+    fireEvent.change(screen.getByLabelText(/correo electrónico/i), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
       target: { value: 'wrongpassword' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /login/i }));
+    fireEvent.click(screen.getByRole('button', { name: /acceder/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/invalid credentials./i)).toBeInTheDocument();
@@ -73,13 +73,13 @@ describe('Login Component', () => {
       </Router>
     );
 
-    fireEvent.change(screen.getByLabelText(/email address/i), {
+    fireEvent.change(screen.getByLabelText(/correo electrónico/i), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
       target: { value: 'correctpassword' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /login/i }));
+    fireEvent.click(screen.getByRole('button', { name: /acceder/i }));
 
     await waitFor(() => {
       expect(localStorage.getItem('token')).toEqual('fake-token');
@@ -101,10 +101,10 @@ describe('Register Component', () => {
         <Register />
       </Router>
     );
-    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /register/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/correo electrónico/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/nombre de usuario/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/contraseña/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /registrarse/i })).toBeInTheDocument();
   });
 
   it('shows error message on failed registration', async () => {
@@ -121,16 +121,16 @@ describe('Register Component', () => {
       </Router>
     );
 
-    fireEvent.change(screen.getByLabelText(/email address/i), {
+    fireEvent.change(screen.getByLabelText(/correo electrónico/i), {
       target: { value: 'existing@example.com' },
     });
-    fireEvent.change(screen.getByLabelText(/username/i), {
+    fireEvent.change(screen.getByLabelText(/nombre de usuario/i), {
       target: { value: 'existinguser' },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
       target: { value: 'password123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /register/i }));
+    fireEvent.click(screen.getByRole('button', { name: /registrarse/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/email already registered./i)).toBeInTheDocument();
@@ -151,16 +151,16 @@ describe('Register Component', () => {
       </Router>
     );
 
-    fireEvent.change(screen.getByLabelText(/email address/i), {
+    fireEvent.change(screen.getByLabelText(/correo electrónico/i), {
       target: { value: 'new@example.com' },
     });
-    fireEvent.change(screen.getByLabelText(/username/i), {
+    fireEvent.change(screen.getByLabelText(/nombre de usuario/i), {
       target: { value: 'newuser' },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
       target: { value: 'newpassword123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /register/i }));
+    fireEvent.click(screen.getByRole('button', { name: /registrarse/i }));
 
     await waitFor(() => {
       // The UI now shows a verification notice instead of redirecting immediately

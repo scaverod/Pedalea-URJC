@@ -2,36 +2,67 @@ import React from 'react';
 
 function Home() {
   return (
-    <div className="container mt-5">
-      <div className="p-5 mb-4 bg-light rounded-3">
-        <div className="container-fluid py-5">
-          <h1 className="display-5 fw-bold">Welcome to URJC pedalea!</h1>
-          <p className="col-md-8 fs-4">
-            Your platform to create, share, and discover cycling routes within the URJC community.
-            Join us to promote cycling, manage suggestions, and participate in our gamification system.
-          </p>
-          <button className="btn btn-primary btn-lg" type="button">Learn More</button>
+    <main>
+      <section className="hero">
+        <div className="hero-left">
+          <h1 className="hero-title">URJC pedalea</h1>
+          <p className="hero-sub">Crea, comparte y descubre rutas ciclistas en la comunidad URJC.</p>
+          <div className="hero-ctas">
+            <a className="btn" href="/routes">Explorar rutas</a>
+            <a className="btn btn-secondary" href="/upload">Sube tu ruta</a>
+          </div>
         </div>
-      </div>
+        <div className="hero-right">
+          <div className="hero-card">
+            <div className="pulse" />
+          </div>
+        </div>
+      </section>
 
-      <div className="row">
-        <div className="col-md-4">
-          <h2>Explore Routes</h2>
-          <p>Discover new and exciting cycling routes shared by the community.</p>
-          <p><a className="btn btn-secondary" href="/routes">View details &raquo;</a></p>
+      <section>
+        <h2>Nuestras Rutas Destacadas</h2>
+        <p>Explora algunas de las rutas más populares y mejor valoradas por nuestra comunidad.</p>
+        <div className="card-grid">
+          <div className="card">
+            <h3>Ruta del Campus de Móstoles</h3>
+            <p>Un recorrido suave y pintoresco alrededor del campus principal.</p>
+            <a className="link-accent" href="/routes/mostoles">Ver ruta →</a>
+          </div>
+          <div className="card">
+            <h3>Camino del Río</h3>
+            <p>Una ruta más larga que sigue el curso del río, ideal para ciclistas experimentados.</p>
+            <a className="link-accent" href="/routes/rio">Ver ruta →</a>
+          </div>
+          <div className="card">
+            <h3>Parque Coimbra Challenge</h3>
+            <p>Desafía tus límites con esta ruta exigente con subidas y bajadas.</p>
+            <a className="link-accent" href="/routes/coimbra">Ver ruta →</a>
+          </div>
         </div>
-        <div className="col-md-4">
-          <h2>Share Your Rides</h2>
-          <p>Create and upload your own GPX routes to share with other cyclists.</p>
-          <p><a className="btn btn-secondary" href="/upload">View details &raquo;</a></p>
+      </section>
+
+      <section>
+        <h2>Únete a la Comunidad</h2>
+        <p>Conecta con otros ciclistas, comparte tus experiencias y participa en eventos.</p>
+        <div className="card-grid">
+          <div className="card">
+            <h3>Eventos y Quedadas</h3>
+            <p>Descubre los próximos eventos ciclistas organizados por la URJC.</p>
+            <a className="link-accent" href="/events">Ver eventos →</a>
+          </div>
+          <div className="card">
+            <h3>Foro de Discusión</h3>
+            <p>Comparte consejos, haz preguntas y conecta con la comunidad.</p>
+            <a className="link-accent" href="/forum">Ir al foro →</a>
+          </div>
+          <div className="card">
+            <h3>Gamificación</h3>
+            <p>Gana puntos, insignias y sube de nivel participando activamente.</p>
+            <a className="link-accent" href="/gamification">Más información →</a>
+          </div>
         </div>
-        <div className="col-md-4">
-          <h2>Community & Gamification</h2>
-          <p>Engage with the community, suggest improvements, and earn points!</p>
-          <p><a className="btn btn-secondary" href="/community">View details &raquo;</a></p>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 

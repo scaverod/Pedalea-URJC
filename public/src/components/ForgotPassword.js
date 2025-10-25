@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -33,31 +34,26 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">Forgot Password</div>
-            <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                {error && <div className="alert alert-danger">{error}</div>}
-                {message && <div className="alert alert-success">{message}</div>}
-                <div className="mb-3">
-                  <label htmlFor="emailInput" className="form-label">Email address</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="emailInput"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary">Send Reset Link</button>
-              </form>
-            </div>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-card-header">Recuperar Contraseña</div>
+        <form onSubmit={handleSubmit}>
+          {error && <div className="alert-error">{error}</div>}
+          {message && <div className="alert-success">{message}</div>}
+          <div className="form-group">
+            <label htmlFor="emailInput" className="form-label">Correo Electrónico</label>
+            <input
+              type="email"
+              className="form-input"
+              id="emailInput"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-        </div>
+          <button type="submit" className="auth-button">Enviar Enlace de Recuperación</button>
+        </form>
+        <Link to="/login" className="auth-link">Volver al Inicio de Sesión</Link>
       </div>
     </div>
   );

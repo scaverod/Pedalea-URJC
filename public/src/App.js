@@ -10,33 +10,13 @@ import ConfirmDelete from './components/ConfirmDelete';
 import Profile from './components/Profile';
 import AdminDashboard from './components/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import Header from './components/Header';
 
 function App() {
   return (
     <Router>
       <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/login">Login</Link>
-            </li>
-            <li>
-              <Link to="/register">Register</Link>
-            </li>
-            <li>
-              <Link to="/forgot-password">Forgot Password</Link>
-            </li>
-            <li>
-              <Link to="/profile">Profile</Link>
-            </li>
-            <li>
-              <Link to="/admin">Admin Dashboard</Link>
-            </li>
-          </ul>
-        </nav>
+        <Header />
 
         <Routes>
           <Route path="/" element={<Home />} />
