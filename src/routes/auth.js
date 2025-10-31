@@ -205,16 +205,18 @@ router.get('/verify-email/:token', async (req, res) => {
             .get(token, Date.now());
 
         if (!user) {
-            return res.status(400).json({ message: 'El token de verificación no es válido o ha expirado.' });
+            // Token inválido o expirado: redirige a una página de error amigable en el cliente
+            return res.redirect('/verificado-error');
         }
 
         db.prepare('UPDATE users SET emailVerified = 1, emailVerificationToken = NULL, emailVerificationExpires = NULL WHERE id = ?')
           .run(user.id);
 
-        res.json({ message: 'Correo verificado correctamente.' });
+        // Éxito: redirige a una página de confirmación amigable en el cliente
+        return res.redirect('/verificado');
     } catch (e) {
         console.error('Error en verificación de correo:', e);
-        res.status(500).json({ message: 'Error del servidor durante la verificación de correo.' });
+        return res.redirect('/verificado-error');
     }
 });
 

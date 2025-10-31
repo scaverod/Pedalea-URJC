@@ -8,6 +8,8 @@ import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import ConfirmDelete from './components/ConfirmDelete';
 import Profile from './components/Profile';
+import EmailVerified from './components/EmailVerified';
+import EmailVerifyError from './components/EmailVerifyError';
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const AdminRoutes = lazy(() => import('./components/AdminRoutes'));
 const AdminBlog = lazy(() => import('./components/AdminBlog'));
@@ -28,6 +30,8 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/confirm-delete/:token" element={<ConfirmDelete />} />
+          <Route path="/verificado" element={<EmailVerified />} />
+          <Route path="/verificado-error" element={<EmailVerifyError />} />
           <Route
             path="/profile"
             element={
