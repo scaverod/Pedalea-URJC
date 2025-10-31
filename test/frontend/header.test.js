@@ -28,10 +28,10 @@ describe('Header component', () => {
       </MemoryRouter>
     );
 
-    // Nav links are visible
-    expect(screen.getByRole('link', { name: /inicio/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /rutas/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /acerca/i })).toBeInTheDocument();
+  // Nav links are visible
+  expect(screen.getByRole('link', { name: /inicio/i })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /rutas/i })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /comunidad/i })).toBeInTheDocument();
 
     // Login action is available
     await waitFor(() => {

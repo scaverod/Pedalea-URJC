@@ -85,8 +85,8 @@ function Header() {
 
       <nav className={`main-nav ${menuOpen ? 'open' : ''}`} aria-label="Principal" aria-hidden={!menuOpen && window.innerWidth <= 820}>
         <Link to="/" onClick={() => setMenuOpen(false)} className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Inicio</Link>
-        <Link to="/routes" onClick={() => setMenuOpen(false)} className={`nav-link ${location.pathname === '/routes' ? 'active' : ''}`}>Rutas</Link>
-        <Link to="/about" onClick={() => setMenuOpen(false)} className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}>Acerca</Link>
+        <Link to="/rutas" onClick={() => setMenuOpen(false)} className={`nav-link ${location.pathname === '/rutas' ? 'active' : ''}`}>Rutas</Link>
+        <Link to="/comunidad" onClick={() => setMenuOpen(false)} className={`nav-link ${location.pathname === '/comunidad' ? 'active' : ''}`}>Comunidad</Link>
 
         {/* acciones duplicadas para menú móvil (se muestran solo en mobile) */}
         <div className="menu-actions">

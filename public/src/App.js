@@ -2,6 +2,10 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 import Home from './components/Home';
+import Rutas from './components/Rutas';
+import Comunidad from './components/Comunidad';
+import About from './components/About';
+import Legal from './components/Legal';
 import Login from './components/Login';
 import Register from './components/Register';
 import ForgotPassword from './components/ForgotPassword';
@@ -15,6 +19,7 @@ const AdminRoutes = lazy(() => import('./components/AdminRoutes'));
 const AdminBlog = lazy(() => import('./components/AdminBlog'));
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import NotFound from './components/NotFound';
 
 function App() {
@@ -26,6 +31,10 @@ function App() {
         <Suspense fallback={<div style={{padding:'1rem'}}>Cargando…</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/rutas" element={<Rutas />} />
+          <Route path="/comunidad" element={<Comunidad />} />
+          <Route path="/acerca" element={<About />} />
+          <Route path="/legal" element={<Legal />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -76,6 +85,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
+        <Footer />
       </div>
     </Router>
   );
