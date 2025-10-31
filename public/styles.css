@@ -4,6 +4,7 @@
 :root {
 	/* Paleta URJC (según manual corporativo) */
 	--urjc-primary: #DA291C; /* Rojo URJC - color de acento principal */
+	--urjc-primary-rgb: 218 41 28; /* RGB del rojo URJC para sombras/transparencias */
 	--urjc-primary-700: #b21f18;
 	--urjc-grey: #807F83; /* Gris URJC */
 	--urjc-black: #000000;
@@ -109,7 +110,8 @@ a.nav-link:focus {
 	background: linear-gradient(90deg, rgba(218,41,28,0.95), rgba(182,31,24,0.95));
 	color: #fff;
 	border-radius: 10px;
-	box-shadow: 0 6px 22px rgba(11,35,64,0.12);
+	/* Sombra con tinte rojo sutil */
+	box-shadow: 0 6px 22px rgb(var(--urjc-primary-rgb) / 0.18);
 }
 .app-header .brand { display:flex; gap:.75rem; align-items:center }
 .brand-logo { width:56px; height:56px; display:inline-block }
@@ -211,7 +213,8 @@ a.nav-link:focus {
 	background: var(--urjc-surface);
 	/* sin borde redondeado para barra fija a ancho completo */
 	border-radius: 0;
-	box-shadow: 0 -6px 16px rgba(11,35,64,0.06);
+	/* Sombra superior con tinte rojo muy sutil */
+	box-shadow: 0 -6px 16px rgb(var(--urjc-primary-rgb) / 0.14);
 	color: var(--urjc-text);
 	z-index: 100;
 }
