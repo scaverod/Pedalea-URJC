@@ -1,4 +1,36 @@
+# Node dependencies
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+
+# Webpack bundles/chunks (generated)
+public/bundle.js
+public/bundle.js.map
+public/chunk.*.js
+public/chunk.*.js.map
+public/*.LICENSE.txt
+
+# Source maps (general)
+*.map
+
+# OS files
+.DS_Store
+
+# Coverage
+coverage/
+
+# Local env overrides
+.env.local
+.env.*.local
+
+# Optional: uploaded files (uncomment to ignore runtime uploads)
+# data/uploads/node_modules/
 data/
 .env
 .DS_Store
