@@ -15,6 +15,7 @@ const AdminRoutes = lazy(() => import('./components/AdminRoutes'));
 const AdminBlog = lazy(() => import('./components/AdminBlog'));
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
       </div>
