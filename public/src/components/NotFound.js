@@ -36,7 +36,21 @@ export default function NotFound() {
   return (
     <div className="auth-container" style={{ textAlign: 'center' }}>
       <div className="auth-card">
-        <img src="/logo.png" alt="logo" style={{ width: 96, height: 96, margin: '0 auto 12px', display: 'block' }} />
+        <div
+          style={{
+            width: 96,
+            height: 96,
+            borderRadius: '50%',
+            background: 'var(--urjc-primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 12px',
+            boxShadow: '0 6px 18px rgba(218,41,28,0.25)'
+          }}
+        >
+          <img src="/logo.png" alt="logo" style={{ width: 60, height: 60, objectFit: 'contain' }} />
+        </div>
         <div className="auth-card-header">¡Uy! Ruta no encontrada</div>
         <p>
           El camino por el que intentas ir en bici es peligroso.
