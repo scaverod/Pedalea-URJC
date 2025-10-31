@@ -138,9 +138,9 @@ function Header() {
                 </button>
                 {adminMenuOpen && (
                   <div className="admin-submenu">
-                    <Link to="/admin" onClick={() => setAdminMenuOpen(false)} className="admin-submenu-item">Usuarios</Link>
-                    <span className="admin-submenu-item disabled">Rutas</span>
-                    <span className="admin-submenu-item disabled">Blog</span>
+                    <Link to="/admin/users" onClick={() => setAdminMenuOpen(false)} className="admin-submenu-item">Usuarios</Link>
+                    <Link to="/admin/routes" onClick={() => setAdminMenuOpen(false)} className="admin-submenu-item disabled">Rutas</Link>
+                    <Link to="/admin/blog" onClick={() => setAdminMenuOpen(false)} className="admin-submenu-item disabled">Blog</Link>
                   </div>
                 )}
               </div>

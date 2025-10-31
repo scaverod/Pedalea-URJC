@@ -18,7 +18,7 @@ describe('Basic API', () => {
   test('POST /api/auth/register', async () => {
     const reg = await request(app).post('/api/auth/register').send({ email: testEmail, password: testPassword, username: 'tester' });
     expect(reg.statusCode).toBe(201);
-  expect(reg.body).toHaveProperty('message', 'User registered successfully. Verification email sent.');
+  expect(reg.body).toHaveProperty('message', 'Usuario registrado correctamente. Correo de verificación enviado.');
   }); // Added missing closing brace here
 
   test('POST /api/routes upload GPX', async () => {

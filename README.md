@@ -8,7 +8,7 @@ Descripción
 
 Resumen y alcance
 ------------------
-- Tecnología frontend: HTML5, CSS, JavaScript (framework a decidir).
+- Tecnología frontend: React + React Router, HTML5 y CSS (bundling con Webpack).
 - Tecnología backend: Node.js.
 - Base de datos: SQLite (inicialmente).
 - Mapas: OpenStreetMap + motor de enrutamiento open-source (OSRM/GraphHopper/Valhalla).
@@ -206,17 +206,22 @@ Epic 8 — Moderación
 - Banner cookies y páginas About/Ayuda
 
 ## 9. Siguientes pasos recomendados
-1. Definir stack frontend (React/Vue/Svelte) y backend (Express/NestJS).
-2. Crear backlog inicial y sprints priorizando MVP.
-3. Generar script de creación del admin inicial que fuerce cambio de contraseña.
-4. Preparar variables de entorno para SMTP y motor de enrutamiento.
+1. Afinar build del frontend: activar code splitting para reducir el tamaño de `bundle.js` (>500 KiB) y mejorar performance.
+2. Endurecer seguridad en desarrollo: cambiar `devtool` a `source-map` y reactivar CSP en dev eliminando `contentSecurityPolicy: false` (mantener excepción solo si es imprescindible).
+3. Crear tests de UI para el Header (toggle móvil, estado activo, dropdown administración) con React Testing Library.
+4. Implementar páginas de Administración para "Rutas" y "Blog" (ahora en borrador en el submenú).
+5. Añadir soporte de avatar con imagen (no solo inicial) y preferencia de tema.
+
+### Desarrollo (cómo ejecutar)
+- Terminal A (watch frontend): `npm run watch-fe`
+- Terminal B (servidor dev): `npm run dev`
+- Nota: si en desarrollo ves pantalla en blanco por CSP, vuelve a compilar y usa recarga forzada (Cmd+Shift+R). A medio plazo migraremos a `source-map` y CSP activa.
 
 ---
 
 ## Kanban (actualizado)
 
-Tablero con tres columnas: To Do | In Progress | Done
-Tablero con tres columnas: To Do | In Progress | Done | On review
+Tablero con columnas: To Do | In Progress | Done | On review
 To Do
 ------
 - PP-01: Noticias y Eventos — Crear CRUD de noticias en ES/EN
@@ -248,10 +253,11 @@ To Do
 - AD-05: Moderación de Puntos Críticos y Sugerencias
 - MD-01: Botón "Reportar" en contenido
 - MD-02: Revisión de reportes en admin
-- NF-01: Hacer la UI responsive
-- NF-02: Aplicar colores URJC y animaciones
 - I18N-01: Internacionalización ES/EN y API de traducción
-- NF-03: Decidir frameworks/librerías frontend
+- Optimización FE: Code splitting y lazy loading para reducir bundle.
+- Seguridad Dev: Cambiar devtool a `source-map` y reactivar CSP.
+- Tests UI: Header (toggle móvil, activo, dropdown admin).
+- Admin: Implementar vistas "Rutas" y "Blog" del submenú.
 
 In Progress
 -----------
@@ -259,6 +265,7 @@ In Progress
 - US-07: Eliminar cuenta y anonimizar contenido - Backend y frontend implementado; flujo de eliminación enviado por email y confirmación con contraseña en cliente. (On review: tests added)
 - AD-07: Dashboard admin con tareas - Listado de usuarios implementado, CRUD pendiente.
 - AD-08: Gestión de usuarios (banear, reset pwd) - Backend listo, frontend pendiente.
+ - UX/Nav: Afinado de estilos activos y tamaños (iteración ongoing).
 
 Done
 ----
@@ -269,6 +276,12 @@ Done
 - NF-04: Decidir framework backend (Node.js/Express)
 - NF-05: Preparar SQLite y esquema inicial
 - US-05(SVC): Configurar SMTP en entorno (placeholders en .env)
+ - UX/Nav: Rediseño completo del header y navegación responsive (hamburger, cierre al navegar).
+ - UX/Nav: Estado activo mejorado para enlaces (fondo sutil + indicador inferior) y botones Perfil/Administración.
+ - UX/Nav: Avatar con inicial + nombre en el header.
+ - Bugfix: El header ahora se actualiza tras login/redirect (lectura inmediata de localStorage + validación /auth/me).
+ - Dev: Relajar CSP sólo en desarrollo para evitar pantalla en blanco con webpack devtool.
+ - Admin/Nav: Nuevo menú "Administración" con submenú (Usuarios activo; Rutas y Blog como borrador).
 
 Implemented features (summary)
 --------------------------------

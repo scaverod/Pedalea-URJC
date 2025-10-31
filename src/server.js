@@ -13,12 +13,36 @@ const userRoutes = require('./routes/users'); // Import user routes
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Use helmet but relax Content Security Policy in development so webpack's devtool (eval) isn't blocked.
-if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
-  // Disable CSP in development for easier debugging (webpack devtool uses eval()).
-  app.use(helmet({ contentSecurityPolicy: false }));
-} else {
-  app.use(helmet());
+// Helmet with CSP; allow inline scripts only in development to avoid blocking dev tooling/harmless inlined code
+const isDev = process.env.NODE_ENV !== 'production';
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      // Scripts only from self; allow inline in dev to avoid tooling issues
+      "script-src": ["'self'"].concat(isDev ? ["'unsafe-inline'"] : []),
+      // Styles from self and Google Fonts stylesheet; allow inline only in dev
+      "style-src": ["'self'", 'https://fonts.googleapis.com']
+        .concat(isDev ? ["'unsafe-inline'"] : []),
+      // Fonts from self and Google Fonts CDN; allow data: for inlined fonts if any
+      "font-src": ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      // Images from self and data URIs
+      "img-src": ["'self'", 'data:'],
+    },
+  },
+}));
+
+// In development, disable aggressive caching so new bundles load immediately
+if (isDev) {
+  app.use((req, res, next) => {
+    if (/\.(js|css|html)$/.test(req.path)) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Surrogate-Control', 'no-store');
+    }
+    next();
+  });
 }
 app.use(cors());
 app.use(express.json());
@@ -75,11 +99,6 @@ app.get('/api/ping', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes); // Use user routes
 
-// Return JSON 404 for any unmatched /api/* routes (helps clients avoid HTML 404 responses)
-app.use('/api', (req, res) => {
-  res.status(404).json({ message: 'API endpoint not found.' });
-});
-
 // Upload GPX (simple)
 app.post('/api/routes', upload.single('gpx'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'gpx_required' });
@@ -108,6 +127,11 @@ app.post('/api/news', (req, res) => {
   const info = stmt.run(title, content, lang || 'es');
   const item = db.prepare('SELECT id, title, content, lang, createdAt FROM news WHERE id = ?').get(info.lastInsertRowid);
   res.json({ news: item });
+});
+
+// Return JSON 404 for any unmatched /api/* routes (helps clients avoid HTML 404 responses)
+app.use('/api', (req, res) => {
+  res.status(404).json({ message: 'API endpoint not found.' });
 });
 
 // Serve frontend for any non-API route (allows client-side routing for pages like /reset-password/:token)

@@ -66,8 +66,8 @@ describe('User Management API', () => {
             .get('/api/users')
             .set('x-auth-token', userToken);
 
-        expect(res.statusCode).toEqual(403);
-        expect(res.body).toHaveProperty('message', 'Forbidden: You do not have the necessary permissions.');
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toHaveProperty('message', 'Prohibido: No tienes los permisos necesarios.');
     });
 
     it('should allow admin to create a new user', async () => {
@@ -77,8 +77,8 @@ describe('User Management API', () => {
             .set('x-auth-token', adminToken)
             .send({ email: newUserEmail, password: 'newuserpass', username: 'newuser', role: 'ROLE_USER' });
 
-        expect(res.statusCode).toEqual(201);
-        expect(res.body).toHaveProperty('message', 'User created successfully.');
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toHaveProperty('message', 'Usuario creado correctamente.');
 
         const user = db.prepare('SELECT * FROM users WHERE email = ?').get(newUserEmail);
         expect(user).toBeDefined();
@@ -92,8 +92,8 @@ describe('User Management API', () => {
             .set('x-auth-token', userToken)
             .send({ email: newUserEmail, password: 'anotherpass', username: 'anotheruser', role: 'ROLE_USER' });
 
-        expect(res.statusCode).toEqual(403);
-        expect(res.body).toHaveProperty('message', 'Forbidden: You do not have the necessary permissions.');
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toHaveProperty('message', 'Prohibido: No tienes los permisos necesarios.');
     });
 
     it('should allow admin to update any user', async () => {
@@ -103,8 +103,8 @@ describe('User Management API', () => {
             .set('x-auth-token', adminToken)
             .send({ username: updatedUsername });
 
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toHaveProperty('message', 'User updated successfully.');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('message', 'Usuario actualizado correctamente.');
 
         const user = db.prepare('SELECT * FROM users WHERE id = ?').get(adminUser.id);
         expect(user.username).toEqual(updatedUsername);
@@ -117,8 +117,8 @@ describe('User Management API', () => {
             .set('x-auth-token', userToken)
             .send({ username: updatedUsername });
 
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toHaveProperty('message', 'User updated successfully.');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('message', 'Usuario actualizado correctamente.');
 
         const user = db.prepare('SELECT * FROM users WHERE id = ?').get(regularUser.id);
         expect(user.username).toEqual(updatedUsername);
@@ -130,8 +130,8 @@ describe('User Management API', () => {
             .set('x-auth-token', userToken)
             .send({ username: 'attemptedhack' });
 
-        expect(res.statusCode).toEqual(403);
-        expect(res.body).toHaveProperty('message', 'Forbidden: You do not have permission to update this user.');
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toHaveProperty('message', 'Prohibido: No tienes permiso para actualizar este usuario.');
     });
 
     it('should allow admin to delete a user', async () => {
@@ -145,8 +145,8 @@ describe('User Management API', () => {
             .delete(`/api/users/${userToDelete.id}`)
             .set('x-auth-token', adminToken);
 
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toHaveProperty('message', 'User deleted successfully.');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('message', 'Usuario eliminado correctamente.');
 
         const deletedUser = db.prepare('SELECT * FROM users WHERE id = ?').get(userToDelete.id);
         expect(deletedUser).toBeUndefined();
@@ -163,7 +163,7 @@ describe('User Management API', () => {
             .delete(`/api/users/${userToDelete.id}`)
             .set('x-auth-token', userToken);
 
-        expect(res.statusCode).toEqual(403);
-        expect(res.body).toHaveProperty('message', 'Forbidden: You do not have the necessary permissions.');
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toHaveProperty('message', 'Prohibido: No tienes los permisos necesarios.');
     });
 });

@@ -11,8 +11,8 @@ router.get('/', auth, authorize(['ROLE_ADMIN']), (req, res) => {
         const users = db.prepare('SELECT id, email, username, role, points, createdAt FROM users').all();
         res.json(users);
     } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({ message: 'Server error fetching users.' });
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ message: 'Error del servidor al obtener usuarios.' });
     }
 });
 
@@ -22,16 +22,16 @@ router.get('/:id', auth, (req, res) => {
     try {
         const user = db.prepare('SELECT id, email, username, role, points, createdAt FROM users WHERE id = ?').get(id);
         if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
+            return res.status(404).json({ message: 'Usuario no encontrado.' });
         }
         // Allow admin to view any user, or a user to view their own profile
         if (req.user.role === 'ROLE_ADMIN' || req.user.id === user.id) {
             return res.json(user);
         }
-        res.status(403).json({ message: 'Forbidden: You do not have permission to view this user.' });
+        res.status(403).json({ message: 'Prohibido: No tienes permiso para ver este usuario.' });
     } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Server error fetching user.' });
+        console.error('Error al obtener usuario:', error);
+        res.status(500).json({ message: 'Error del servidor al obtener usuario.' });
     }
 });
 
@@ -40,20 +40,20 @@ router.post('/', auth, authorize(['ROLE_ADMIN']), async (req, res) => {
     const { email, password, username, role } = req.body;
 
     if (!email || !password || !username || !role) {
-        return res.status(400).json({ message: 'All fields are required.' });
+        return res.status(400).json({ message: 'Todos los campos son obligatorios.' });
     }
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const stmt = db.prepare('INSERT INTO users (email, passwordHash, username, role) VALUES (?, ?, ?, ?)');
         stmt.run(email, hashedPassword, username, role);
-        res.status(201).json({ message: 'User created successfully.' });
+        res.status(201).json({ message: 'Usuario creado correctamente.' });
     } catch (error) {
         if (error.message.includes('UNIQUE constraint failed: users.email')) {
-            return res.status(409).json({ message: 'Email already registered.' });
+            return res.status(409).json({ message: 'El correo ya está registrado.' });
         }
-        console.error('Error creating user:', error);
-        res.status(500).json({ message: 'Server error creating user.' });
+        console.error('Error al crear usuario:', error);
+        res.status(500).json({ message: 'Error del servidor al crear usuario.' });
     }
 });
 
@@ -63,7 +63,7 @@ router.put('/:id', auth, async (req, res) => {
     const { email, username, role, password } = req.body; // password for admin to reset
 
     if (req.user.role !== 'ROLE_ADMIN' && req.user.id !== parseInt(id)) {
-        return res.status(403).json({ message: 'Forbidden: You do not have permission to update this user.' });
+        return res.status(403).json({ message: 'Prohibido: No tienes permiso para actualizar este usuario.' });
     }
 
     try {
@@ -89,23 +89,23 @@ router.put('/:id', auth, async (req, res) => {
         }
 
         if (updateFields.length === 0) {
-            return res.status(400).json({ message: 'No fields to update.' });
+            return res.status(400).json({ message: 'No hay campos para actualizar.' });
         }
 
         const stmt = db.prepare(`UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`);
         const info = stmt.run(...updateValues, id);
 
         if (info.changes === 0) {
-            return res.status(404).json({ message: 'User not found or no changes made.' });
+            return res.status(404).json({ message: 'Usuario no encontrado o sin cambios.' });
         }
 
-        res.status(200).json({ message: 'User updated successfully.' });
+        res.status(200).json({ message: 'Usuario actualizado correctamente.' });
     } catch (error) {
         if (error.message.includes('UNIQUE constraint failed: users.email')) {
-            return res.status(409).json({ message: 'Email already in use.' });
+            return res.status(409).json({ message: 'El correo ya está en uso.' });
         }
-        console.error('Error updating user:', error);
-        res.status(500).json({ message: 'Server error updating user.' });
+        console.error('Error al actualizar usuario:', error);
+        res.status(500).json({ message: 'Error del servidor al actualizar usuario.' });
     }
 });
 
@@ -117,13 +117,13 @@ router.delete('/:id', auth, authorize(['ROLE_ADMIN']), (req, res) => {
         const info = stmt.run(id);
 
         if (info.changes === 0) {
-            return res.status(404).json({ message: 'User not found.' });
+            return res.status(404).json({ message: 'Usuario no encontrado.' });
         }
 
-        res.status(200).json({ message: 'User deleted successfully.' });
+        res.status(200).json({ message: 'Usuario eliminado correctamente.' });
     } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({ message: 'Server error deleting user.' });
+        console.error('Error al eliminar usuario:', error);
+        res.status(500).json({ message: 'Error del servidor al eliminar usuario.' });
     }
 });
 
@@ -133,7 +133,7 @@ router.post('/:id/resend-verification', auth, authorize(['ROLE_ADMIN']), async (
     console.log(`[users] resend-verification invoked for id=${id} by user=${req.user && req.user.id}`);
     try {
         const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
-        if (!user) return res.status(404).json({ message: 'User not found.' });
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
 
         const crypto = require('crypto');
         const verificationToken = crypto.randomBytes(20).toString('hex');
@@ -145,7 +145,7 @@ router.post('/:id/resend-verification', auth, authorize(['ROLE_ADMIN']), async (
                         // If SMTP is not configured, skip sending mail in development and return immediately
                         if (!process.env.SMTP_HOST) {
                             console.log('[users] SMTP not configured - skipping resend verification email (dev mode)');
-                            return res.json({ message: 'Verification email resent (skipped - SMTP not configured).' });
+                            return res.json({ message: 'Correo de verificación reenviado (omitido - SMTP no configurado).' });
                         }
                         const transporter = require('nodemailer').createTransport({
                                 host: process.env.SMTP_HOST,
@@ -154,16 +154,16 @@ router.post('/:id/resend-verification', auth, authorize(['ROLE_ADMIN']), async (
                                 auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
                         });
                         try {
-                            await transporter.sendMail({ to: user.email, from: process.env.SMTP_FROM_EMAIL, subject: 'Verify your email', html: `Click: <a href="${verifyUrl}">${verifyUrl}</a>` });
+                            await transporter.sendMail({ to: user.email, from: process.env.SMTP_FROM_EMAIL, subject: 'Verifica tu correo electrónico', html: `Haz clic: <a href="${verifyUrl}">${verifyUrl}</a>` });
                         } catch (e) {
                             console.error('Resend verification sendMail error', e);
-                            return res.status(500).json({ message: 'Failed to send verification email.' });
+                            return res.status(500).json({ message: 'No se pudo enviar el correo de verificación.' });
                         }
 
-                        res.json({ message: 'Verification email resent.' });
+                        res.json({ message: 'Correo de verificación reenviado.' });
     } catch (error) {
-        console.error('Resend verification error:', error);
-        res.status(500).json({ message: 'Server error.' });
+        console.error('Error al reenviar verificación:', error);
+        res.status(500).json({ message: 'Error del servidor.' });
     }
 });
 
@@ -173,7 +173,7 @@ router.post('/:id/send-reset', auth, authorize(['ROLE_ADMIN']), async (req, res)
     console.log(`[users] send-reset invoked for id=${id} by user=${req.user && req.user.id}`);
     try {
         const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
-        if (!user) return res.status(404).json({ message: 'User not found.' });
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
 
         const crypto = require('crypto');
         const resetToken = crypto.randomBytes(20).toString('hex');
@@ -185,7 +185,7 @@ router.post('/:id/send-reset', auth, authorize(['ROLE_ADMIN']), async (req, res)
                         // If SMTP is not configured, skip sending mail in development and return immediately
                         if (!process.env.SMTP_HOST) {
                             console.log('[users] SMTP not configured - skipping send reset email (dev mode)');
-                            return res.json({ message: 'Password reset email sent (skipped - SMTP not configured).' });
+                            return res.json({ message: 'Correo de restablecimiento enviado (omitido - SMTP no configurado).' });
                         }
                         const transporter = require('nodemailer').createTransport({
                                 host: process.env.SMTP_HOST,
@@ -194,16 +194,16 @@ router.post('/:id/send-reset', auth, authorize(['ROLE_ADMIN']), async (req, res)
                                 auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
                         });
                         try {
-                            await transporter.sendMail({ to: user.email, from: process.env.SMTP_FROM_EMAIL, subject: 'Password reset', html: `Reset: <a href="${resetUrl}">${resetUrl}</a>` });
+                            await transporter.sendMail({ to: user.email, from: process.env.SMTP_FROM_EMAIL, subject: 'Restablecer contraseña', html: `Restablecer: <a href="${resetUrl}">${resetUrl}</a>` });
                         } catch (e) {
                             console.error('Send reset sendMail error', e);
-                            return res.status(500).json({ message: 'Failed to send password reset email.' });
+                            return res.status(500).json({ message: 'No se pudo enviar el correo de restablecimiento.' });
                         }
 
-                        res.json({ message: 'Password reset email sent.' });
+                        res.json({ message: 'Correo de restablecimiento enviado.' });
     } catch (error) {
-        console.error('Send reset error:', error);
-        res.status(500).json({ message: 'Server error.' });
+        console.error('Error al enviar restablecimiento:', error);
+        res.status(500).json({ message: 'Error del servidor.' });
     }
 });
 
@@ -214,11 +214,11 @@ router.post('/:id/suspend', auth, authorize(['ROLE_ADMIN']), (req, res) => {
     try {
         const stmt = db.prepare('UPDATE users SET suspended = ? WHERE id = ?');
         const info = stmt.run(suspend ? 1 : 0, id);
-        if (info.changes === 0) return res.status(404).json({ message: 'User not found.' });
-        res.json({ message: suspend ? 'User suspended.' : 'User unsuspended.' });
+        if (info.changes === 0) return res.status(404).json({ message: 'Usuario no encontrado.' });
+        res.json({ message: suspend ? 'Usuario suspendido.' : 'Usuario reactivado.' });
     } catch (error) {
-        console.error('Suspend error:', error);
-        res.status(500).json({ message: 'Server error.' });
+        console.error('Error al suspender:', error);
+        res.status(500).json({ message: 'Error del servidor.' });
     }
 });
 

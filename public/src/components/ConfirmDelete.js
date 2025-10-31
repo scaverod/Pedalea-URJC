@@ -22,17 +22,17 @@ function ConfirmDelete() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage(data.message || 'Account deleted.');
+        setMessage(data.message || 'Cuenta eliminada.');
         // Clear local storage and navigate to home
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/');
       } else {
-        setError(data.message || 'Could not delete account.');
+        setError(data.message || 'No se pudo eliminar la cuenta.');
       }
     } catch (e) {
       console.error('Confirm delete submit error:', e);
-      setError('Server error while deleting account.');
+      setError('Error del servidor al eliminar la cuenta.');
     } finally {
       setLoading(false);
     }
@@ -43,18 +43,18 @@ function ConfirmDelete() {
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="card">
-            <div className="card-header">Confirm Account Deletion</div>
+            <div className="card-header">Confirmar eliminación de cuenta</div>
             <div className="card-body">
               {error && <div className="text-danger mb-2">{error}</div>}
               {message && <div className="text-success mb-2">{message}</div>}
-              <p>Please enter your password to confirm account deletion. This action is irreversible.</p>
+              <p>Introduce tu contraseña para confirmar la eliminación de la cuenta. Esta acción es irreversible.</p>
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">Password</label>
+                  <label className="form-label">Contraseña</label>
                   <input type="password" className="form-control" value={password} onChange={e => setPassword(e.target.value)} />
                 </div>
 
-                <button className="btn btn-danger" type="submit" disabled={loading}>{loading ? 'Deleting...' : 'Delete my account'}</button>
+                <button className="btn btn-danger" type="submit" disabled={loading}>{loading ? 'Eliminando...' : 'Eliminar mi cuenta'}</button>
               </form>
             </div>
           </div>

@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
     const { email, password, username } = req.body;
 
     if (!email || !password || !username) {
-        return res.status(400).json({ message: 'All fields are required.' });
+        return res.status(400).json({ message: 'Todos los campos son obligatorios.' });
     }
 
     try {
@@ -40,11 +40,11 @@ router.post('/register', async (req, res) => {
 
                 // Send verification email
                 const verifyUrl = `http://${req.headers.host}/api/auth/verify-email/${verificationToken}`;
-                const mailOptions = {
+        const mailOptions = {
                         to: email,
                         from: process.env.SMTP_FROM_EMAIL,
-                        subject: 'Please verify your email',
-                        html: `Please verify your email by clicking this link: <a href="${verifyUrl}">${verifyUrl}</a>`
+            subject: 'Verifica tu correo electrónico',
+            html: `Por favor verifica tu correo haciendo clic en este enlace: <a href="${verifyUrl}">${verifyUrl}</a>`
                 };
 
                 try {
@@ -53,13 +53,13 @@ router.post('/register', async (req, res) => {
                     console.error('Error sending verification email:', e);
                 }
 
-                res.status(201).json({ message: 'User registered successfully. Verification email sent.' });
+                res.status(201).json({ message: 'Usuario registrado correctamente. Correo de verificación enviado.' });
     } catch (error) {
         if (error.message.includes('UNIQUE constraint failed: users.email')) {
-            return res.status(409).json({ message: 'Email already registered.' });
+            return res.status(409).json({ message: 'El correo ya está registrado.' });
         }
-        console.error('Registration error:', error);
-        res.status(500).json({ message: 'Server error during registration.' });
+        console.error('Error en registro:', error);
+        res.status(500).json({ message: 'Error del servidor durante el registro.' });
     }
 });
 
@@ -68,7 +68,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
+        return res.status(400).json({ message: 'Correo y contraseña son obligatorios.' });
     }
 
     try {
@@ -76,23 +76,23 @@ router.post('/login', async (req, res) => {
         const user = stmt.get(email);
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials.' });
+            return res.status(400).json({ message: 'Credenciales inválidas.' });
         }
 
         // If configured, require email verification before allowing login
         const requireVerify = process.env.REQUIRE_EMAIL_VERIFICATION === 'true';
         if (requireVerify && !user.emailVerified && user.role !== 'ROLE_ADMIN') {
-            return res.status(403).json({ message: 'Email not verified. Please verify your email before logging in.' });
+            return res.status(403).json({ message: 'Correo no verificado. Por favor verifica tu correo antes de iniciar sesión.' });
         }
 
         // Prevent suspended users from logging in
         if (user.suspended) {
-            return res.status(403).json({ message: 'Account suspended. Contact an administrator.' });
+            return res.status(403).json({ message: 'Cuenta suspendida. Contacta con un administrador.' });
         }
 
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials.' });
+            return res.status(400).json({ message: 'Credenciales inválidas.' });
         }
 
         const token = jwt.sign(
@@ -103,8 +103,8 @@ router.post('/login', async (req, res) => {
 
         res.json({ token, user: { id: user.id, email: user.email, username: user.username, role: user.role } });
     } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error during login.' });
+        console.error('Error en login:', error);
+        res.status(500).json({ message: 'Error del servidor durante el inicio de sesión.' });
     }
 });
 
@@ -114,11 +114,11 @@ router.get('/me', auth, (req, res) => {
     try {
         const stmt = db.prepare('SELECT id, email, username, role FROM users WHERE id = ?');
         const user = stmt.get(req.user.id);
-        if (!user) return res.status(404).json({ message: 'User not found.' });
+        if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
         res.json(user);
     } catch (e) {
-        console.error('GET /me error:', e);
-        res.status(500).json({ message: 'Server error.' });
+        console.error('Error en GET /me:', e);
+        res.status(500).json({ message: 'Error del servidor.' });
     }
 });
 
@@ -127,7 +127,7 @@ router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-        return res.status(400).json({ message: 'Email is required.' });
+        return res.status(400).json({ message: 'El correo es obligatorio.' });
     }
 
     try {
@@ -135,7 +135,7 @@ router.post('/forgot-password', async (req, res) => {
 
         if (!user) {
             // For security, don't reveal if the email doesn't exist
-            return res.status(200).json({ message: 'If an account with that email exists, a password reset link has been sent.' });
+            return res.status(200).json({ message: 'Si existe una cuenta con ese correo, se ha enviado un enlace para restablecer la contraseña.' });
         }
 
         // Generate a reset token
@@ -150,19 +150,19 @@ router.post('/forgot-password', async (req, res) => {
         const mailOptions = {
             to: user.email,
             from: process.env.SMTP_FROM_EMAIL,
-            subject: 'Password Reset Request',
-            html: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
-                   Please click on the following link, or paste this into your browser to complete the process:\n\n
-                   <a href="${resetUrl}">${resetUrl}</a>\n\n
-                   If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+            subject: 'Solicitud de restablecimiento de contraseña',
+            html: `Has recibido este correo porque tú (u otra persona) solicitó restablecer la contraseña de tu cuenta.<br/><br/>
+                   Haz clic en el siguiente enlace (o pégalo en tu navegador) para completar el proceso:<br/>
+                   <a href="${resetUrl}">${resetUrl}</a><br/><br/>
+                   Si no solicitaste esto, ignora este correo y tu contraseña seguirá siendo la misma.`,
         };
 
         await transporter.sendMail(mailOptions);
 
-        res.status(200).json({ message: 'If an account with that email exists, a password reset link has been sent.' });
+        res.status(200).json({ message: 'Si existe una cuenta con ese correo, se ha enviado un enlace para restablecer la contraseña.' });
     } catch (error) {
-        console.error('Forgot password error:', error);
-        res.status(500).json({ message: 'Server error during password reset request.' });
+        console.error('Error en olvido de contraseña:', error);
+        res.status(500).json({ message: 'Error del servidor durante la solicitud de restablecimiento de contraseña.' });
     }
 });
 
@@ -172,7 +172,7 @@ router.post('/reset-password/:token', async (req, res) => {
     const { password } = req.body;
 
     if (!password) {
-        return res.status(400).json({ message: 'New password is required.' });
+        return res.status(400).json({ message: 'La nueva contraseña es obligatoria.' });
     }
 
     try {
@@ -180,7 +180,7 @@ router.post('/reset-password/:token', async (req, res) => {
             .get(token, Date.now());
 
         if (!user) {
-            return res.status(400).json({ message: 'Password reset token is invalid or has expired.' });
+            return res.status(400).json({ message: 'El token de restablecimiento no es válido o ha expirado.' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -188,10 +188,10 @@ router.post('/reset-password/:token', async (req, res) => {
         db.prepare('UPDATE users SET passwordHash = ?, resetPasswordToken = NULL, resetPasswordExpires = NULL WHERE id = ?')
             .run(hashedPassword, user.id);
 
-        res.status(200).json({ message: 'Password has been reset successfully.' });
+        res.status(200).json({ message: 'La contraseña se ha restablecido correctamente.' });
     } catch (error) {
-        console.error('Reset password error:', error);
-        res.status(500).json({ message: 'Server error during password reset.' });
+        console.error('Error en restablecimiento de contraseña:', error);
+        res.status(500).json({ message: 'Error del servidor durante el restablecimiento de contraseña.' });
     }
 });
 
@@ -205,27 +205,27 @@ router.get('/verify-email/:token', async (req, res) => {
             .get(token, Date.now());
 
         if (!user) {
-            return res.status(400).json({ message: 'Verification token is invalid or has expired.' });
+            return res.status(400).json({ message: 'El token de verificación no es válido o ha expirado.' });
         }
 
         db.prepare('UPDATE users SET emailVerified = 1, emailVerificationToken = NULL, emailVerificationExpires = NULL WHERE id = ?')
           .run(user.id);
 
-        res.json({ message: 'Email verified successfully.' });
+        res.json({ message: 'Correo verificado correctamente.' });
     } catch (e) {
-        console.error('Email verification error:', e);
-        res.status(500).json({ message: 'Server error during email verification.' });
+        console.error('Error en verificación de correo:', e);
+        res.status(500).json({ message: 'Error del servidor durante la verificación de correo.' });
     }
 });
 
 // Request account deletion (sends confirmation email)
 router.post('/request-delete', async (req, res) => {
     const { email } = req.body;
-    if (!email) return res.status(400).json({ message: 'Email is required.' });
+    if (!email) return res.status(400).json({ message: 'El correo es obligatorio.' });
 
     try {
         const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
-        if (!user) return res.status(200).json({ message: 'If an account with that email exists, a deletion link has been sent.' });
+    if (!user) return res.status(200).json({ message: 'Si existe una cuenta con ese correo, se ha enviado un enlace de eliminación.' });
 
         const delToken = crypto.randomBytes(20).toString('hex');
         const delExpires = Date.now() + 24*60*60*1000; // 24h
@@ -237,16 +237,16 @@ router.post('/request-delete', async (req, res) => {
         const mailOptions = {
             to: user.email,
             from: process.env.SMTP_FROM_EMAIL,
-            subject: 'Confirm account deletion',
-            html: `Click to confirm account deletion: <a href="${deleteUrl}">${deleteUrl}</a>`
+            subject: 'Confirmar eliminación de cuenta',
+            html: `Haz clic para confirmar la eliminación de la cuenta: <a href="${deleteUrl}">${deleteUrl}</a>`
         };
 
         try { await transporter.sendMail(mailOptions); } catch(e) { console.error('Error sending deletion email:', e); }
 
-        res.status(200).json({ message: 'If an account with that email exists, a deletion link has been sent.' });
+        res.status(200).json({ message: 'Si existe una cuenta con ese correo, se ha enviado un enlace de eliminación.' });
     } catch (e) {
-        console.error('Request delete error:', e);
-        res.status(500).json({ message: 'Server error.' });
+        console.error('Error al solicitar eliminación:', e);
+        res.status(500).json({ message: 'Error del servidor.' });
     }
 });
 
@@ -255,20 +255,20 @@ router.post('/confirm-delete/:token', async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!password) return res.status(400).json({ message: 'Password is required to confirm account deletion.' });
+    if (!password) return res.status(400).json({ message: 'La contraseña es obligatoria para confirmar la eliminación de la cuenta.' });
 
     try {
         const user = db.prepare('SELECT * FROM users WHERE accountDeletionToken = ? AND accountDeletionExpires > ?')
             .get(token, Date.now());
-        if (!user) return res.status(400).json({ message: 'Deletion token is invalid or has expired.' });
+    if (!user) return res.status(400).json({ message: 'El token de eliminación no es válido o ha expirado.' });
 
         const isMatch = await bcrypt.compare(password, user.passwordHash);
-        if (!isMatch) return res.status(403).json({ message: 'Password incorrect.' });
+    if (!isMatch) return res.status(403).json({ message: 'Contraseña incorrecta.' });
 
         db.prepare('DELETE FROM users WHERE id = ?').run(user.id);
-        res.json({ message: 'Account deleted successfully.' });
+        res.json({ message: 'Cuenta eliminada correctamente.' });
     } catch (e) {
-        console.error('Confirm delete error:', e);
-        res.status(500).json({ message: 'Server error.' });
+        console.error('Error al confirmar eliminación:', e);
+        res.status(500).json({ message: 'Error del servidor.' });
     }
 });

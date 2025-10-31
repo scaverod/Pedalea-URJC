@@ -36,7 +36,7 @@ describe('Login Component', () => {
     fetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
-        json: () => Promise.resolve({ message: 'Invalid credentials.' }),
+        json: () => Promise.resolve({ message: 'Credenciales inválidas.' }),
       })
     );
 
@@ -55,7 +55,7 @@ describe('Login Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /acceder/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/invalid credentials./i)).toBeInTheDocument();
+      expect(screen.getByText(/credenciales inválidas\./i)).toBeInTheDocument();
     });
   });
 
@@ -111,7 +111,7 @@ describe('Register Component', () => {
     fetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
-        json: () => Promise.resolve({ message: 'Email already registered.' }),
+        json: () => Promise.resolve({ message: 'El correo ya está registrado.' }),
       })
     );
 
@@ -133,15 +133,16 @@ describe('Register Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /registrarse/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/email already registered./i)).toBeInTheDocument();
+      expect(screen.getByText(/el correo ya está registrado\./i)).toBeInTheDocument();
     });
   });
 
-  it('navigates to login on successful registration', async () => {
+  it('shows verification message and redirects to login after a short delay', async () => {
+    jest.useFakeTimers();
     fetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ message: 'Registration successful!' }),
+        json: () => Promise.resolve({ message: 'Usuario registrado correctamente. Correo de verificación enviado.' }),
       })
     );
 
@@ -163,11 +164,18 @@ describe('Register Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /registrarse/i }));
 
     await waitFor(() => {
-      // The UI now shows a verification notice instead of redirecting immediately
-      expect(screen.getByText(/Registration successful!/i)).toBeInTheDocument();
+      // The UI shows a verification notice
+      expect(screen.getByText(/Usuario registrado correctamente\./i)).toBeInTheDocument();
       expect(screen.getByText(/valida primero tu correo/i)).toBeInTheDocument();
-      // Do not navigate automatically
-      expect(mockedUsedNavigate).not.toHaveBeenCalled();
     });
+
+    // Advance timers to trigger auto-redirect
+  jest.advanceTimersByTime(5000);
+
+    await waitFor(() => {
+      expect(mockedUsedNavigate).toHaveBeenCalledWith('/login', { replace: true });
+    });
+
+    jest.useRealTimers();
   });
 });

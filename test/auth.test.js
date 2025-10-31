@@ -29,8 +29,8 @@ describe('Auth API', () => {
             .send({ email: testEmail, password: testPassword, username: testUsername });
 
     expect(res.statusCode).toEqual(201);
-    // Registration now triggers a verification email; message updated accordingly
-    expect(res.body).toHaveProperty('message', 'User registered successfully. Verification email sent.');
+    // Registro ahora envía un correo de verificación
+    expect(res.body).toHaveProperty('message', 'Usuario registrado correctamente. Correo de verificación enviado.');
 
         const user = db.prepare('SELECT * FROM users WHERE email = ?').get(testEmail);
         expect(user).toBeDefined();
@@ -50,8 +50,8 @@ describe('Auth API', () => {
             .post('/api/auth/register')
             .send({ email: testEmail, password: testPassword, username: 'anotheruser' });
 
-        expect(res.statusCode).toEqual(409);
-        expect(res.body).toHaveProperty('message', 'Email already registered.');
+    expect(res.statusCode).toEqual(409);
+    expect(res.body).toHaveProperty('message', 'El correo ya está registrado.');
     });
 
     it('should log in an existing user successfully and return a token', async () => {
@@ -82,8 +82,8 @@ describe('Auth API', () => {
             .post('/api/auth/login')
             .send({ email: testEmail, password: 'wrongpassword' });
 
-        expect(res.statusCode).toEqual(400);
-        expect(res.body).toHaveProperty('message', 'Invalid credentials.');
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toHaveProperty('message', 'Credenciales inválidas.');
     });
 
     it('should not log in with unregistered email', async () => {
@@ -91,42 +91,42 @@ describe('Auth API', () => {
             .post('/api/auth/login')
             .send({ email: 'nonexistent@example.com', password: testPassword });
 
-        expect(res.statusCode).toEqual(400);
-        expect(res.body).toHaveProperty('message', 'Invalid credentials.');
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toHaveProperty('message', 'Credenciales inválidas.');
     });
 
     it('should return 400 if email or password is missing during registration', async () => {
         const res1 = await request(app)
             .post('/api/auth/register')
             .send({ password: testPassword, username: testUsername });
-        expect(res1.statusCode).toEqual(400);
-        expect(res1.body).toHaveProperty('message', 'All fields are required.');
+    expect(res1.statusCode).toEqual(400);
+    expect(res1.body).toHaveProperty('message', 'Todos los campos son obligatorios.');
 
         const res2 = await request(app)
             .post('/api/auth/register')
             .send({ email: testEmail, username: testUsername });
-        expect(res2.statusCode).toEqual(400);
-        expect(res2.body).toHaveProperty('message', 'All fields are required.');
+    expect(res2.statusCode).toEqual(400);
+    expect(res2.body).toHaveProperty('message', 'Todos los campos son obligatorios.');
 
         const res3 = await request(app)
             .post('/api/auth/register')
             .send({ email: testEmail, password: testPassword });
-        expect(res3.statusCode).toEqual(400);
-        expect(res3.body).toHaveProperty('message', 'All fields are required.');
+    expect(res3.statusCode).toEqual(400);
+    expect(res3.body).toHaveProperty('message', 'Todos los campos son obligatorios.');
     });
 
     it('should return 400 if email or password is missing during login', async () => {
         const res1 = await request(app)
             .post('/api/auth/login')
             .send({ password: testPassword });
-        expect(res1.statusCode).toEqual(400);
-        expect(res1.body).toHaveProperty('message', 'Email and password are required.');
+    expect(res1.statusCode).toEqual(400);
+    expect(res1.body).toHaveProperty('message', 'Correo y contraseña son obligatorios.');
 
         const res2 = await request(app)
             .post('/api/auth/login')
             .send({ email: testEmail });
-        expect(res2.statusCode).toEqual(400);
-        expect(res2.body).toHaveProperty('message', 'Email and password are required.');
+    expect(res2.statusCode).toEqual(400);
+    expect(res2.body).toHaveProperty('message', 'Correo y contraseña son obligatorios.');
     });
 
     it('should send a password reset link for a registered email', async () => {
@@ -142,8 +142,8 @@ describe('Auth API', () => {
             .post('/api/auth/forgot-password')
             .send({ email: testEmail });
 
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toHaveProperty('message', 'If an account with that email exists, a password reset link has been sent.');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('message', 'Si existe una cuenta con ese correo, se ha enviado un enlace para restablecer la contraseña.');
 
         const user = db.prepare('SELECT * FROM users WHERE email = ?').get(testEmail);
         expect(user.resetPasswordToken).toBeDefined();
@@ -156,8 +156,8 @@ describe('Auth API', () => {
             .post('/api/auth/forgot-password')
             .send({ email: 'nonexistent@example.com' });
 
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toHaveProperty('message', 'If an account with that email exists, a password reset link has been sent.');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('message', 'Si existe una cuenta con ese correo, se ha enviado un enlace para restablecer la contraseña.');
         expect(nodemailer.createTransport().sendMail).not.toHaveBeenCalled(); // No email should be sent
     });
 
@@ -180,8 +180,8 @@ describe('Auth API', () => {
             .post(`/api/auth/reset-password/${resetToken}`)
             .send({ password: newPassword });
 
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toHaveProperty('message', 'Password has been reset successfully.');
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('message', 'La contraseña se ha restablecido correctamente.');
 
         const userAfterReset = db.prepare('SELECT * FROM users WHERE email = ?').get(testEmail);
         expect(userAfterReset.resetPasswordToken).toBeNull();
@@ -201,8 +201,8 @@ describe('Auth API', () => {
             .post('/api/auth/reset-password/invalidtoken')
             .send({ password: 'newSecurePassword123' });
 
-        expect(res.statusCode).toEqual(400);
-        expect(res.body).toHaveProperty('message', 'Password reset token is invalid or has expired.');
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toHaveProperty('message', 'El token de restablecimiento no es válido o ha expirado.');
     });
 
     it('should not reset password with an expired token', async () => {
@@ -221,8 +221,8 @@ describe('Auth API', () => {
             .post(`/api/auth/reset-password/${expiredToken}`)
             .send({ password: 'newSecurePassword123' });
 
-        expect(res.statusCode).toEqual(400);
-        expect(res.body).toHaveProperty('message', 'Password reset token is invalid or has expired.');
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toHaveProperty('message', 'El token de restablecimiento no es válido o ha expirado.');
     });
 
     it('should return 400 if new password is missing during reset password', async () => {
@@ -230,7 +230,7 @@ describe('Auth API', () => {
             .post('/api/auth/reset-password/sometoken')
             .send({});
 
-        expect(res.statusCode).toEqual(400);
-        expect(res.body).toHaveProperty('message', 'New password is required.');
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toHaveProperty('message', 'La nueva contraseña es obligatoria.');
     });
 });

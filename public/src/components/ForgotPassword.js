@@ -25,11 +25,11 @@ function ForgotPassword() {
       if (response.ok) {
         setMessage(data.message);
       } else {
-        setError(data.message || 'Failed to send password reset email.');
+        setError(data.message || 'No se pudo enviar el correo de restablecimiento.');
       }
     } catch (err) {
       console.error('Forgot password error:', err);
-      setError('Network error or server is unreachable.');
+      setError('Error de red o el servidor no responde.');
     }
   };
 

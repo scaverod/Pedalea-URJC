@@ -30,11 +30,11 @@ function Login() {
         setSuccessMessage('Inicio de sesión correcto. Redirigiendo...'); // Set success message
         setTimeout(() => navigate('/profile'), 650);
       } else {
-        setError(data.message || 'Login failed');
+        setError(data.message || 'Error de inicio de sesión');
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Network error or server is unreachable.');
+      setError('Error de red o el servidor no responde.');
     }
   };
 
