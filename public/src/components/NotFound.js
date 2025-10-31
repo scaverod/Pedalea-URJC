@@ -12,6 +12,18 @@ export default function NotFound() {
           <br />
           ¿Por qué no vas por una ruta más segura?
         </p>
+        {/* Ilustración 404 bajo el texto */}
+        <img
+          src="/images/404-bici.png"
+          alt="Señal de peligro y bicicleta"
+          style={{
+            display: 'block',
+            margin: '16px auto 0',
+            maxWidth: 360,
+            width: '100%',
+            height: 'auto',
+          }}
+        />
         <Link to="/" className="auth-button" style={{ display: 'inline-block', textDecoration: 'none' }}>
           Ir al inicio
         </Link>
